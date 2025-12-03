@@ -1,21 +1,24 @@
-FROM mcr.microsoft.com/playwright/python:v1.57.0-jammy
+# Use Playwright image matching your requirements.txt version (1.45.0)
+FROM mcr.microsoft.com/playwright/python:v1.45.0-jammy
 
 WORKDIR /app
 
 # Copy and install backend requirements
-# Ensure that backend/requirements.txt exists relative to the Dockerfile
 COPY backend/requirements.txt requirements.txt
 RUN python -m pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code and set working dir
-# Ensure that backend/ directory exists and contains your main.py
+# Install Playwright browsers (Chromium is usually sufficient)
+RUN playwright install chromium
+
+# Copy backend code
 COPY backend/ ./backend
+
+# Set working directory to backend
 WORKDIR /app/backend
 
-# Expose and run the application using uvicorn
+# Expose port
 EXPOSE 8000
-# Update: Switched to shell form (CMD without brackets) to allow for
-# dynamic environment variable usage. This ensures the app uses the
-# port provided by Railway ($PORT) or falls back to 8000 (:-8000) locally.
+
+# Run the application (Railway will inject $PORT)
 CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
