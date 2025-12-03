@@ -15,5 +15,7 @@ WORKDIR /app/backend
 
 # Expose and run the application using uvicorn
 EXPOSE 8000
-# Assuming 'main' module contains a FastAPI/Starlette app named 'app'
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Update: Switched to shell form (CMD without brackets) to allow for
+# dynamic environment variable usage. This ensures the app uses the
+# port provided by Railway ($PORT) or falls back to 8000 (:-8000) locally.
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
