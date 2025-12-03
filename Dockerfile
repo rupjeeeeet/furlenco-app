@@ -8,19 +8,18 @@ RUN apt-get update && apt-get install -y \
     wget unzip && \
     rm -rf /var/lib/apt/lists/*
 
-# Work inside /app
 WORKDIR /app
 
-# COPY backend requirements FIRST (because context = ROOT)
+# Copy backend requirements
 COPY backend/requirements.txt requirements.txt
 
-# Install python dependencies
+# Install python deps
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright
+# Install playwright
 RUN pip install playwright && playwright install --with-deps
 
-# Copy the entire backend folder
+# Copy entire backend folder
 COPY backend/ .
 
 EXPOSE 8000
