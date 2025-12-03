@@ -1,27 +1,20 @@
-FROM python:3.11-slim
+# /Dockerfile  (place at repo root)
+FROM mcr.microsoft.com/playwright/python:1.45.0-focal
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libnss3 libatk1.0-0 libatk-bridge2.0-0 \
-    libcups2 libxkbcommon0 libxcomposite1 libxdamage1 \
-    libxrandr2 libgbm1 libgtk-3-0 libasound2 \
-    wget unzip && \
-    rm -rf /var/lib/apt/lists/*
-
+# Working directory
 WORKDIR /app
 
-# Copy backend requirements
+# Copy and install backend requirements (backend/requirements.txt)
 COPY backend/requirements.txt requirements.txt
-
-# Install python deps
+RUN python -m pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install playwright
-RUN pip install playwright && playwright install --with-deps
+# Copy backend code
+COPY backend/ ./backend
+WORKDIR /app/backend
 
-# Copy entire backend folder
-COPY backend/ .
-
+# Expose port
 EXPOSE 8000
 
+# Default command to run the FastAPI web server
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
